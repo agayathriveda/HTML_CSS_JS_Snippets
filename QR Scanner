@@ -1,0 +1,90 @@
+#HTML CODE
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>QR Code Scanner</h1>
+        <video id="qr-video" autoplay></video>
+        <canvas id="qr-canvas"></canvas>
+        <button id="start-button">Start Scanning</button>
+    </div>
+    <script src="qr-scanner.js"></script>
+</body>
+</html>
+#CSS CODE
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    text-align: center;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+video {
+    width: 100%;
+    max-width: 640px;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+canvas {
+    display: none;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+#JS CODE
+document.getElementById('start-button').addEventListener('click', function() {
+    const video = document.getElementById('qr-video');
+    const canvasElement = document.getElementById('qr-canvas');
+    const canvas = canvasElement.getContext('2d');
+
+  
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+        .then(stream => {
+            video.srcObject = stream;
+            video.setAttribute('playsinline', true); 
+            video.play();
+            requestAnimationFrame(tick);
+        })
+        .catch(err => {
+            console.error("Error accessing the camera", err);
+        });
+
+    function tick() {
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            canvasElement.height = video.videoHeight;
+            canvasElement.width = video.videoWidth;
+            canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+           
+            console.log("Captured frame for QR code detection");
+        }
+        requestAnimationFrame(tick);
+    }
+});
