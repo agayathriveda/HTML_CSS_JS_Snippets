@@ -1,0 +1,100 @@
+#HTML CODE
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Profile Search</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>GitHub Profile Search</h1>
+        <input type="text" id="search-input" placeholder="Enter GitHub username">
+        <button id="search-button">Search</button>
+        <div id="profile-info"></div>
+    </div>
+    <script src="github-search.js"></script>
+</body>
+</html>
+
+#CSS CODE
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    text-align: center;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+input, button {
+    padding: 10px;
+    margin: 10px 0;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+#profile-info {
+    margin-top: 20px;
+}
+
+
+#JS CODE
+
+document.getElementById('search-button').addEventListener('click', function() {
+    const searchInput = document.getElementById('search-input');
+    const username = searchInput.value.trim();
+    if (!username) {
+        alert('Please enter a GitHub username.');
+        return;
+    }
+
+    fetch(`https://api.github.com/users/${username}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            displayProfileInfo(data);
+        })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+            alert('User not found or an error occurred.');
+        });
+});
+
+function displayProfileInfo(data) {
+    const profileInfo = document.getElementById('profile-info');
+    profileInfo.innerHTML = `
+        <h2>${data.name || data.login}</h2>
+        <img src="${data.avatar_url}" alt="${data.login}'s avatar" width="100">
+        <p>Public repos: ${data.public_repos}</p>
+        <p>Followers: ${data.followers}</p>
+        <p>Following: ${data.following}</p>
+        <p><a href="${data.html_url}" target="_blank">Visit GitHub profile</a></p>
+    `;
+}
