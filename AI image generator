@@ -1,0 +1,126 @@
+#HTML CODE
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>AI Image Generator</h1>
+        <form id="image-generator-form">
+            <label for="prompt">Enter a prompt:</label>
+            <input type="text" id="prompt" name="prompt" required>
+            <button type="submit">Generate Image</button>
+        </form>
+        <div id="generated-images-container">
+            <!-- Generated images will be appended here -->
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+
+#CSS CODE
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    max-width: 100%;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+input, button {
+    margin-top: 10px;
+    padding: 10px;
+}
+
+button {
+    background-color: #61dafb;
+    color: #282c34;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #51c4d6;
+}
+
+#generated-image-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+#generated-image-info {
+    font-size: 16px;
+    color: #666;
+}
+
+#JS CODE
+
+document.getElementById('image-generator-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const prompt = document.getElementById('prompt').value;
+    if (prompt) {
+        generateImage(prompt);
+    }
+});
+
+function generateImage(prompt) {
+   
+    const apiUrl = 'https://api.openai.com/v1/images';
+    const apiKey = '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'; 
+    const headers = new Headers({
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+    });
+
+    fetch(apiUrl, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+            prompt: prompt,
+            n: 1, 
+            size: "512x512" 
+        
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.data && data.data.length > 0) {
+            const imageUrl = data.data[0].url;
+            displayGeneratedImage(imageUrl);
+        } else {
+            console.error('Failed to generate image');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function displayGeneratedImage(imageUrl) {
+    const imagesContainer = document.getElementById('generated-images-container');
+    const newImage = document.createElement('img');
+    newImage.src = imageUrl;
+    newImage.alt = 'Generated Image';
+    imagesContainer.appendChild(newImage);
+}
